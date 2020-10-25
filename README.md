@@ -1,12 +1,18 @@
 # SnowflakeExEcto
 
-Integrates Snowflake (SnowflakeElixir) with [ecto_sql](), which allows you to use your schemas with Snowflake!
+[![hex.pm](https://img.shields.io/hexpm/v/snowflake_elixir_ecto.svg)](https://hex.pm/packages/snowflake_elixir_ecto)
+[![hexdocs.pm](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/snowflake_elixir_ecto/)
+[![hex.pm](https://img.shields.io/hexpm/dt/snowflake_elixir_ecto.svg)](https://hex.pm/packages/snowflake_elixir_ecto)
+[![hex.pm](https://img.shields.io/hexpm/l/snowflake_elixir_ecto.svg)](https://hex.pm/packages/snowflake_elixir_ecto)
+[![github.com](https://img.shields.io/github/last-commit/joshuataylor/snowflake_elixir_ecto.svg)](https://github.com/joshuataylor/snowflake_elixir_ecto/commits/master)
 
-Right now this is a major WIP, and is not ready for production use.
+**WIP, NOT PRODUCTION READY YET**
+
+Integrates Snowflake through [snowflake_elixir](https://hex.pm/packages/snowflake_elixir) driver with [ecto_sql](https://hex.pm/packages/ecto_sql), which allows you to use your schemas with Snowflake!
 
 ## Installation
 
-The package can be installed by adding `snowflake_elixir_ecto` to your list of dependencies in `mix.exs`:
+Add `snowflake_elixir_ecto` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -18,7 +24,8 @@ end
 
 ## Configuration
 
-In your config/config.exs file, add the following:
+In your `config/config.exs` file, add the following:
+
 ```
 config :my_app, MyApp.Repo,
   username: "yourusername",
@@ -33,6 +40,7 @@ config :my_app, MyApp.Repo,
 ```
 
 Then in your `repo.ex`:
+
 ```elixir
 defmodule MyApp.Repo do
   use Ecto.Repo,
@@ -42,6 +50,7 @@ end
 ```
 
 ## Connection options
+
 ```markdown
 * `:host` - Server hostname, including https. Example: "https://xxx.us-east-1.snowflakecomputing.com"
 * `:username` - Username for your account.
@@ -54,20 +63,25 @@ end
 ```
 
 # Data Mapping
+
 WIP, TODO
 
 ## Snowflake Differences compared to a "traditional" RDBMS
+
 Snowflake isn't like Postgres/MySQL or another database you might be use to. There are a few gotchas you need to watch out for.
 
 Before using this library, it's recommended that you learn how Snowflake works at a basic level.
 
 ### Indexing
+
 - Snowflake does not support indexes, at all.
 - Snowflake does not support unique indexes. You can create them, but it's not enforced. [See contraints](https://docs.snowflake.com/en/sql-reference/constraints-overview.html#supported-constraint-types)
 
 ### Inserts
+
 - Snowflake does not support RETURNING. Thoughts around how to handle this are [here](#todo)
 - Snowflake does not have UPSERT support.
 
 ### Data binding
+
 - Snowflake must insert integers as strings in the JSON for binding, so it's encoded as "0", otherwise you'll get `compilation error:\nUnsupported data type 'java.lang.Integer'`
