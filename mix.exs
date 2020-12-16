@@ -24,6 +24,7 @@ defmodule SnowflakeExEcto.MixProject do
   defp deps do
     [
       {:snowflake_elixir, "~> 0.1.0"},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
