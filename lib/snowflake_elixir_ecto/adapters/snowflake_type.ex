@@ -47,6 +47,13 @@ defmodule SnowflakeExEcto.Type do
     end
   end
 
+  def decode(value, :naive_datetime) do
+    String.replace(value, ".", "")
+    |> String.slice(0..-4)
+    |> String.to_integer()
+    |> DateTime.from_unix(:microsecond)
+  end
+
   def decode(value, _type) do
     {:ok, value}
   end
