@@ -71,10 +71,11 @@ defmodule Ecto.Adapters.Snowflake do
   @impl true
   def dumpers({:map, _}, type), do: [&Ecto.Type.embedded_dump(type, &1, :json)]
   def dumpers({:in, sub}, {:in, sub}), do: [{:array, sub}]
-  def dumpers(:binary_id, type), do: [type, Ecto.UUID]
+  def dumpers(:binary_id, type), do: [type, Snowflake.Ecto.UUID]
   def dumpers(ecto_type, type), do: [type, &encode(&1, ecto_type)]
 
   @impl true
+  def loaders(:binary_id, type), do: [Snowflake.Ecto.UUID, type]
   def loaders(ecto_type, type), do: [&decode(&1, ecto_type), type]
 
   @impl true

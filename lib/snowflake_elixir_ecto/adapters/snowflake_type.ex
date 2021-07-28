@@ -2,10 +2,6 @@ defmodule SnowflakeExEcto.Type do
   @moduledoc """
   Encodes a type to what Snowflake expects, or decodes a type from what Snowflake gives.
   """
-  def encode(value, :boolean) do
-    value
-  end
-
   def encode(value, :time) do
     {:ok, v, _} = DateTime.from_iso8601("1970-01-01 #{value}Z")
     ms_since_epoch = DateTime.to_unix(v) * 1000
@@ -17,22 +13,12 @@ defmodule SnowflakeExEcto.Type do
     {:ok, to_string(nanos_since_midnight)}
   end
 
-  def encode(value, :integer) do
-    {:ok, to_string(value)}
-  end
-
-  def encode(value, :naive_datetime) do
-    foo = value
-    |> NaiveDateTime.to_iso8601()
-
-    {:ok, foo}
-  end
-
-  def encode(value, :uuid), do: Ecto.UUID.load(value)
-
-  def encode(value, _type) do
-    {:ok, to_string(value)}
-  end
+  def encode(value, :boolean), do: value
+  def encode(value, :integer), do: {:ok, to_string(value)}
+  def encode(value, :naive_datetime), do: {:ok, NaiveDateTime.to_iso8601(value)}
+  def encode(value, {:array, :string}), do: {:ok, value}
+  def encode(value, :uuid), do: value
+  def encode(value, type), do: {:ok, to_string(value)}
 
   def decode(value, :decimal) do
     {:ok, Decimal.new(value)}
@@ -54,7 +40,19 @@ defmodule SnowflakeExEcto.Type do
     |> DateTime.from_unix(:microsecond)
   end
 
-  def decode(value, _type) do
-    {:ok, value}
+  def decode(value, {:maybe, :utc_datetime}), do:  decode(value, :utc_datetime)
+  def decode(value, :integer) when is_bitstring(value), do: {:ok, String.to_integer(value)}
+
+  def decode(value, :utc_datetime) do
+    # we can get 1440 from here, not sure why?
+    value
+    |> String.split(" ")
+    |> hd
+    |> String.replace(".", "")
+    |> String.slice(0..-4)
+    |> String.to_integer()
+    |> DateTime.from_unix(:microsecond)
   end
+
+  def decode(value, _type), do: {:ok, value}
 end
