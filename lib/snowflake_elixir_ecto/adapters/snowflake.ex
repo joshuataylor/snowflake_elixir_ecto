@@ -88,7 +88,7 @@ defmodule Ecto.Adapters.Snowflake do
           "#{index + 1}",
           %{
             type: convert_select_type(value),
-            value: Jason.encode!(value)
+            value: encode_select_type(value)
           }
         }
       end)
@@ -115,7 +115,7 @@ defmodule Ecto.Adapters.Snowflake do
           "#{index + 1}",
           %{
             type: convert_type(schema.__schema__(:type, key)),
-            value: Jason.encode!(Keyword.get(params, key))
+            value: encode_select_type(Keyword.get(params, key))
           }
         }
       end)
@@ -327,4 +327,7 @@ defmodule Ecto.Adapters.Snowflake do
   defp convert_select_type(i) when is_bitstring(i), do: "TEXT"
   defp convert_select_type(i) when is_list(i), do: "ARRAY"
   defp convert_select_type(_), do: "TEXT"
+
+  defp encode_select_type(i) when is_bitstring(i), do: i
+  defp encode_select_type(i), do: Jason.encode!(i)
 end
