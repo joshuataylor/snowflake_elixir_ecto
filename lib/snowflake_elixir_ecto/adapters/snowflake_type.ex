@@ -14,7 +14,7 @@ defmodule SnowflakeExEcto.Type do
   end
 
   def encode(value, :boolean), do: value
-  def encode(value, :integer), do: {:ok, to_string(value)}
+  def encode(value, :integer), do: {:ok, value}
   def encode(value, :naive_datetime), do: {:ok, NaiveDateTime.to_iso8601(value)}
   def encode(value, {:array, :string}), do: {:ok, value}
   def encode(value, :uuid), do: value

@@ -83,12 +83,12 @@ defmodule Ecto.Adapters.Snowflake do
     lots =
       params
       |> Enum.with_index()
-      |> Enum.map(fn {field_name, index} ->
+      |> Enum.map(fn {value, index} ->
         {
           "#{index + 1}",
           %{
-            type: convert_select_type(field_name),
-            value: field_name
+            type: convert_select_type(value),
+            value: Jason.encode!(value)
           }
         }
       end)
@@ -115,7 +115,7 @@ defmodule Ecto.Adapters.Snowflake do
           "#{index + 1}",
           %{
             type: convert_type(schema.__schema__(:type, key)),
-            value: Keyword.get(params, key)
+            value: Jason.encode!(Keyword.get(params, key))
           }
         }
       end)
@@ -166,13 +166,9 @@ defmodule Ecto.Adapters.Snowflake do
       Ecto.Adapters.Snowflake.Connection.options_expr(table.options)
     ]
 
-#    IO.inspect "running query"
     result = Ecto.Adapters.SQL.query!(adapter.repo, query, [], options)
 
-#    IO.inspect result, label: "result!!!!!!!!1"
-
     logs = result |> ddl_logs()
-#    IO.inspect logs, label: "show logs?"
 
     {:ok, logs}
   end
@@ -318,15 +314,15 @@ defmodule Ecto.Adapters.Snowflake do
     end
   end
 
-  defp convert_type(:integer), do: "FIXED"
+  defp convert_type(:integer), do: "REAL"
   defp convert_type(:string), do: "TEXT"
   defp convert_type(:boolean), do: "BOOLEAN"
   # @todo fix this to be proper date
-  defp convert_type(:date), do: "TEXT"
+  defp convert_type(:date), do: "DATE"
   defp convert_type(:time), do: "TIME"
-  defp convert_type(_), do: "TEXT"
+  defp convert_type(i), do: "TEXT"
 
-  defp convert_select_type(i) when is_integer(i), do: "FIXED"
+  defp convert_select_type(i) when is_integer(i), do: "REAL"
   defp convert_select_type(i) when is_boolean(i), do: "BOOLEAN"
   defp convert_select_type(i) when is_bitstring(i), do: "TEXT"
   defp convert_select_type(i) when is_list(i), do: "ARRAY"
