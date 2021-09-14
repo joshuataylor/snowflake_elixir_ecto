@@ -314,7 +314,7 @@ defmodule Ecto.Adapters.Snowflake do
     end
   end
 
-  defp convert_type(:integer), do: "REAL"
+  defp convert_type(:integer), do: "FIXED"
   defp convert_type(:string), do: "TEXT"
   defp convert_type(:boolean), do: "BOOLEAN"
   # @todo fix this to be proper date
@@ -322,7 +322,7 @@ defmodule Ecto.Adapters.Snowflake do
   defp convert_type(:time), do: "TIME"
   defp convert_type(i), do: "TEXT"
 
-  defp convert_select_type(i) when is_integer(i), do: "REAL"
+  defp convert_select_type(i) when is_integer(i), do: "FIXED"
   defp convert_select_type(i) when is_boolean(i), do: "BOOLEAN"
   defp convert_select_type(i) when is_bitstring(i), do: "TEXT"
   defp convert_select_type(i) when is_list(i), do: "ARRAY"
