@@ -41,6 +41,7 @@ defmodule Ecto.Adapters.Snowflake do
     * `:password` - Password for your account.
     * `:warehouse` - Warehouse to use on Snowflake. If none set, will use default for the account.
     * `:account_name` - Account name. This is usually the name between the https:// and us-east-1 (or whatever region).
+    * `:role` - the role to connect with.
     * `:database` - the database to connect to.
     * `:schema` - the schema to connect to.
     * `:async` - If set to true, will issue a query then connect every `:async_interval` to see if the query has completed.

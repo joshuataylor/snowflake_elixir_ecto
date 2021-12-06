@@ -13,12 +13,16 @@ defmodule SnowflakeExEcto.Type do
     {:ok, to_string(nanos_since_midnight)}
   end
 
-  def encode(value, :boolean), do: value
+  def encode(true, :boolean), do: "1"
+  def encode(false, :boolean), do: "0"
   def encode(value, :integer), do: {:ok, value}
   def encode(value, :naive_datetime), do: {:ok, NaiveDateTime.to_iso8601(value)}
   def encode(value, {:array, :string}), do: {:ok, value}
   def encode(value, :uuid), do: value
   def encode(value, type), do: {:ok, to_string(value)}
+
+  def decode("1", :boolean), do: {:ok, true}
+  def decode("0", :boolean), do: {:ok, false}
 
   def decode(value, :decimal) do
     {:ok, Decimal.new(value)}
