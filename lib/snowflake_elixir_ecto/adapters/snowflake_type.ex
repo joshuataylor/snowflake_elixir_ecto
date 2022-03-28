@@ -44,10 +44,10 @@ defmodule SnowflakeExEcto.Type do
     |> DateTime.from_unix(:microsecond)
   end
 
-  def decode(value, {:maybe, :utc_datetime}), do:  decode(value, :utc_datetime)
+  def decode(value, {:maybe, :utc_datetime}), do: decode(value, :utc_datetime)
   def decode(value, :integer) when is_bitstring(value), do: {:ok, String.to_integer(value)}
 
-  def decode(value, :utc_datetime) do
+  def decode(value, :utc_datetime) when is_bitstring(value) do
     # we can get 1440 from here, not sure why?
     value
     |> String.split(" ")
