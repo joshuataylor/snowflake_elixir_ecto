@@ -149,7 +149,8 @@ defmodule Ecto.Adapters.Snowflake do
   alias Ecto.Migration.Table
 
   @impl true
-  def execute_ddl(adapter, {command, %Table{} = table, columns}, options) when command in @creates do
+  def execute_ddl(adapter, {command, %Table{} = table, columns}, options)
+      when command in @creates do
     db = Keyword.get(adapter.repo.config, :database)
     schema = Keyword.get(adapter.repo.config, :schema)
 
@@ -157,7 +158,10 @@ defmodule Ecto.Adapters.Snowflake do
 
     query = [
       "CREATE TABLE ",
-      Ecto.Adapters.Snowflake.Connection.if_do(command == :create_if_not_exists, "IF NOT EXISTS "),
+      Ecto.Adapters.Snowflake.Connection.if_do(
+        command == :create_if_not_exists,
+        "IF NOT EXISTS "
+      ),
       table_name,
       ?\s,
       ?(,
@@ -184,23 +188,21 @@ defmodule Ecto.Adapters.Snowflake do
     end
   end
 
-
   @impl true
   def storage_up(opts) do
     database =
       Keyword.fetch!(opts, :database) || raise ":database is nil in repository configuration"
 
-    schema =
-      Keyword.fetch!(opts, :schema)
+    schema = Keyword.fetch!(opts, :schema)
 
-    command = ~s(CREATE DATABASE "#{database}")
+    command = ~s(CREATE DATABASE IF NOT EXISTS "#{database}")
 
     s = run_query(command, opts)
 
     case s do
       {:ok, _} ->
         run_query("USE DATABASE #{database}", opts)
-        run_query("CREATE SCHEMA #{schema}", opts)
+        run_query("CREATE SCHEMA IF NOT EXISTS #{schema}", opts)
         run_query("USE SCHEMA #{schema}", opts)
 
         :ok
@@ -218,12 +220,15 @@ defmodule Ecto.Adapters.Snowflake do
           is_binary(error) and String.contains?(error, "already exists.") ->
             {:error, :already_up}
 
-          %RuntimeError{} -> {:error, error}
+          %RuntimeError{} ->
+            {:error, error}
 
           true ->
             {:error, Exception.message(error)}
         end
-        {:error, %RuntimeError{} = error} -> {:error, Exception.message(error)}
+
+      {:error, %RuntimeError{} = error} ->
+        {:error, Exception.message(error)}
     end
   end
 
@@ -232,7 +237,7 @@ defmodule Ecto.Adapters.Snowflake do
     database =
       Keyword.fetch!(opts, :database) || raise ":database is nil in repository configuration"
 
-    command = "DROP DATABASE \"#{database}\""
+    command = "DROP DATABASE IF EXISTS \"#{database}\""
 
     case run_query(command, opts) do
       {:ok, _} ->
@@ -240,10 +245,13 @@ defmodule Ecto.Adapters.Snowflake do
 
       {:error, %{snowflake: %{code: :invalid_catalog_name}}} ->
         {:error, :already_down}
-      {:error, %RuntimeError{} = error} -> {:error, Exception.message(error)}
+
+      {:error, %RuntimeError{} = error} ->
+        {:error, Exception.message(error)}
 
       {:error, %SnowflakeEx.Result{messages: messages}} ->
         error = hd(messages).message
+
         cond do
           is_binary(error) and String.contains?(error, "does not exist or not authorized.") ->
             {:error, :already_down}
@@ -271,6 +279,7 @@ defmodule Ecto.Adapters.Snowflake do
     end
   end
 
+  @impl true
   def lock_for_migrations(_meta, _opts, fun) do
     fun.()
   end
@@ -288,7 +297,6 @@ defmodule Ecto.Adapters.Snowflake do
     task =
       Task.Supervisor.async_nolink(Ecto.Adapters.SQL.StorageSupervisor, fn ->
         {:ok, conn} = SnowflakeEx.SnowflakeConnectionServer.start_link(opts)
-
         value = SnowflakeEx.SnowflakeConnectionServer.query(conn, sql, [], opts)
         GenServer.stop(conn)
         value
@@ -321,7 +329,7 @@ defmodule Ecto.Adapters.Snowflake do
   # @todo fix this to be proper date
   defp convert_type(:date), do: "DATE"
   defp convert_type(:time), do: "TIME"
-  defp convert_type(i), do: "TEXT"
+  defp convert_type(_), do: "TEXT"
 
   defp convert_select_type(i) when is_integer(i), do: "FIXED"
   defp convert_select_type(i) when is_boolean(i), do: "BOOLEAN"

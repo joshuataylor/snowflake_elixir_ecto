@@ -87,8 +87,6 @@ defmodule Ecto.Adapters.Snowflake.Connection do
     where = where(%{query | wheres: wheres ++ query.wheres}, sources)
 
     [cte, "DELETE FROM ", from, " AS ", name, join, where]
-#    require IEx
-#    IEx.pry
   end
 
   @impl true
@@ -838,7 +836,8 @@ defmodule Ecto.Adapters.Snowflake.Connection do
     ]
   end
 
-  def execute_ddl({_command, %Index{}}), do: error!(nil, "Snowflake adapter does not support this index type")
+  def execute_ddl({_command, %Index{}}),
+    do: error!(nil, "Snowflake adapter does not support this index type")
 
   def execute_ddl({:rename, %Table{} = current_table, %Table{} = new_table}) do
     [
@@ -930,7 +929,6 @@ defmodule Ecto.Adapters.Snowflake.Connection do
   end
 
   def comments_on(_object, _name, nil), do: []
-
 
   def comments_on("INDEX", _name, _comment) do
     error!(nil, "Snowflake does not support adding comments on indexes.")
@@ -1119,9 +1117,11 @@ defmodule Ecto.Adapters.Snowflake.Connection do
       single_quote(literal)
     else
       encoded = "\\x" <> Base.encode16(literal, case: :lower)
-      raise ArgumentError, "default values are interpolated as UTF-8 strings and cannot contain null bytes. " <>
-                           "`#{inspect literal}` is invalid. If you want to write it as a binary, use \"#{encoded}\", " <>
-                           "otherwise refer to PostgreSQL documentation for instructions on how to escape this SQL type"
+
+      raise ArgumentError,
+            "default values are interpolated as UTF-8 strings and cannot contain null bytes. " <>
+              "`#{inspect(literal)}` is invalid. If you want to write it as a binary, use \"#{encoded}\", " <>
+              "otherwise refer to PostgreSQL documentation for instructions on how to escape this SQL type"
     end
   end
 
