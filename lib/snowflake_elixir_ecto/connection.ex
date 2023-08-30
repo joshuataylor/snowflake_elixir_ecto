@@ -640,6 +640,10 @@ defmodule Ecto.Adapters.Snowflake.Connection do
 
   defp expr({:count, _, []}, _sources, _query), do: "count(*)"
 
+  defp expr({:literal, _, [literal]}, _sources, _query) do
+    quote_name(literal)
+  end
+
   defp expr({fun, _, args}, sources, query) when is_atom(fun) and is_list(args) do
     {modifier, args} =
       case args do
