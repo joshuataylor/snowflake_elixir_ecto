@@ -284,6 +284,10 @@ defmodule Ecto.Adapters.Snowflake.Connection do
 
   defp cte(%{with_ctes: _}, _), do: []
 
+  defp cte_expr({name, _, cte}, sources, query) do
+    [quote_name(name), " AS ", cte_query(cte, sources, query)]
+  end
+
   defp cte_expr({name, cte}, sources, query) do
     [quote_name(name), " AS ", cte_query(cte, sources, query)]
   end
