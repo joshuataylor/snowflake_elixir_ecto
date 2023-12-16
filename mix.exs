@@ -11,7 +11,18 @@ defmodule SnowflakeExEcto.MixProject do
       start_permanent: Mix.env() == :prod,
       description: "Snowflake driver written in pure Elixir, using db_connection",
       deps: deps(),
+      package: package(),
       docs: docs()
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Josh Taylor"],
+      licenses: ["MIT"],
+      links: %{
+        GitHub: @source_url
+      }
     ]
   end
 
