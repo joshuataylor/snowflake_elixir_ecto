@@ -1,7 +1,7 @@
 defmodule Ecto.Adapters.Snowflake.Connection do
   @behaviour Ecto.Adapters.SQL.Connection
   @parent_as __MODULE__
-  alias Ecto.Query.{BooleanExpr, JoinExpr, QueryExpr, WithExpr}
+  alias Ecto.Query.{BooleanExpr, JoinExpr, QueryExpr, WithExpr, LimitExpr}
 
   @impl true
   def child_spec(opts) do
@@ -284,6 +284,10 @@ defmodule Ecto.Adapters.Snowflake.Connection do
 
   defp cte(%{with_ctes: _}, _), do: []
 
+  defp cte_expr({name, _, cte}, sources, query) do
+    [quote_name(name), " AS ", cte_query(cte, sources, query)]
+  end
+
   defp cte_expr({name, cte}, sources, query) do
     [quote_name(name), " AS ", cte_query(cte, sources, query)]
   end
@@ -463,6 +467,10 @@ defmodule Ecto.Adapters.Snowflake.Connection do
 
   defp limit(%{limit: nil}, _sources), do: []
 
+  defp limit(%{limit: %LimitExpr{expr: expr}} = query, sources) do
+    [" LIMIT " | expr(expr, sources, query)]
+  end
+
   defp limit(%{limit: %QueryExpr{expr: expr}} = query, sources) do
     [" LIMIT " | expr(expr, sources, query)]
   end
@@ -635,6 +643,10 @@ defmodule Ecto.Adapters.Snowflake.Connection do
   end
 
   defp expr({:count, _, []}, _sources, _query), do: "count(*)"
+
+  defp expr({:literal, _, [literal]}, _sources, _query) do
+    quote_name(literal)
+  end
 
   defp expr({fun, _, args}, sources, query) when is_atom(fun) and is_list(args) do
     {modifier, args} =

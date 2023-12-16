@@ -6,7 +6,7 @@ defmodule SnowflakeExEcto.MixProject do
   def project do
     [
       app: :snowflake_elixir_ecto,
-      version: "0.1.0",
+      version: "0.2.1",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       description: "Snowflake driver written in pure Elixir, using db_connection",
@@ -23,7 +23,7 @@ defmodule SnowflakeExEcto.MixProject do
 
   defp deps do
     [
-      {:snowflake_elixir, "~> 0.1.0"},
+      {:snowflake_elixir, "~> 0.2.0"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
